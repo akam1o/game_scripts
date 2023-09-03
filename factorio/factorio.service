@@ -8,7 +8,7 @@ Type=simple
 ExecStartPre=/usr/bin/docker stop factorio
 ExecStartPre=/usr/bin/docker rm factorio
 ExecStartPre=/usr/bin/docker pull factoriotools/factorio:stable
-ExecStart=/usr/bin/docker run -d -p 34197:34197/udp -p 27015:27015/tcp -v /opt/factorio:/factorio --name factorio factoriotools/factorio:stable
+ExecStart=/usr/bin/docker run -d -p 34197:34197/udp -p 27015:27015/tcp -v /opt/factorio:/factorio --name factorio --restart=unless-stopped factoriotools/factorio:stable
 ExecStop=/usr/bin/docker stop factorio
 Restart=always
 
