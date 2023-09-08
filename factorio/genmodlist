@@ -1,0 +1,75 @@
+#!/usr/bin/env python3
+
+import os
+import argparse
+import json
+import shutil
+
+DEFAULT_MODS = {'mods': [{'name': 'base', 'enabled': True}]}
+
+
+class GenModList():
+
+    def __init__(self):
+        pass
+
+    def get_mods(self, path):
+        files = os.listdir(path)
+        mods = []
+        for file in files:
+            if file.endswith('zip'):
+                mods.append(file.split('_')[0])
+        return mods
+
+    def get_modlist(self, path):
+        mods = self.get_mods(path)
+        modlist = DEFAULT_MODS
+        for mod in mods:
+            modlist['mods'].append({'name': mod, 'enabled': True})
+        return modlist
+
+    def get_modlist_json(self, path):
+        return json.dumps(self.get_modlist(path), indent=2)
+
+
+class CommandGenModList():
+
+    def __init__(self):
+        self.gml = GenModList()
+
+    def command(self):
+        parser = argparse.ArgumentParser(
+            prog='genmodlist',
+            usage='%(prog)s [-h]',
+            description='Factorio mod-list.json Generator')
+        subparsers = parser.add_subparsers()
+
+        parser_output = subparsers.add_parser('output', help='%(prog)s output MODS_DIR_PATH --output_file MOD_LIST_FILE')
+        parser_output.add_argument('mods_dir_path', help='Path to Factorio Mods Directory')
+        parser_output.add_argument('--output_file', help='Path to Factorio mod-list.json File')
+        parser_output.set_defaults(handler=self.command_output)
+
+        args = parser.parse_args()
+        if hasattr(args, 'handler'):
+            args.handler(args)
+        else:
+            parser.print_help()
+
+    def command_output(self, args):
+        modlist_json = self.gml.get_modlist_json(args.mods_dir_path)
+        print(modlist_json)
+        if args.output_file:
+            if os.path.exists(args.output_file):
+                shutil.copy2(args.output_file, args.output_file+'.bak')
+            with open(args.output_file, mode='w') as f:
+                f.write(modlist_json)
+                print('Written to %s' % args.output_file)
+
+
+def main():
+    cmd = CommandGenModList()
+    cmd.command()
+
+
+if __name__ == '__main__':
+    main()
