@@ -2,7 +2,7 @@ version: "3"
 
 services:
   nextcloud_db:
-    image: mariadb:latest
+    image: mariadb
     restart: always
     volumes:
       - /mnt/mysql:/var/lib/mysql
@@ -13,7 +13,7 @@ services:
       - MYSQL_USER=nextcloud
 
   nextcloud_app:
-    image: nextcloud:latest
+    image: nextcloud
     ports:
       - 8080:80
     links:
@@ -21,3 +21,14 @@ services:
     volumes:
       - /mnt/nextcloud:/var/www/html
     restart: always
+
+  dlna_server:
+    image: vladgh/minidlna
+    restart: always
+    volumes:
+      - /mnt/nextcloud/data/MYUSER/files/Shared/Musics:/media/audio
+      - /mnt/nextcloud/data/MYUSER/files/Shared/Videos:/media/video
+    environment:
+      - MINIDLNA_MEDIA_DIR_1=A,/media/audio
+      - MINIDLNA_MEDIA_DIR_2=V,/media/video
+      - MINIDLNA_FRIENDLY_NAME=MY_MEDIA_SERVER
