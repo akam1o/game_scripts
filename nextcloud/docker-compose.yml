@@ -24,6 +24,7 @@ services:
 
   dlna_server:
     image: vladgh/minidlna
+    network_mode: host
     restart: always
     volumes:
       - /mnt/nextcloud/data/MYUSER/files/Shared/Musics:/media/audio
